@@ -30,9 +30,19 @@ class QueryFormatter extends DataFormatter
     public function checkBindings($bindings)
     {
         foreach ($bindings as &$binding) {
+			$isBinary = false;
+
             if (is_string($binding) && !mb_check_encoding($binding, 'UTF-8')) {
-                $binding = '[BINARY DATA]';
-            }
+                $isBinary = true;
+			}
+
+			if (is_string($binding) && preg_match("/^[A-Fa-f0-9]{128,}$/", $binding)) {
+				$isBinary = true;
+			}
+
+			if ($isBinary) {
+				$binding = '[BINARY DATA]';
+			}
         }
 
         return $bindings;
